@@ -3,6 +3,9 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
+  "bin": {
+    "clawcode-build": "./index.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
@@ -10,6 +13,10 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@types/node": "^26.2.0"
+    "@clack/core": "^1.4.3",
+    "@clack/prompts": "^1.7.0",
+    "@types/node": "^26.2.0",
+    "commander": "^15.0.0",
+    "figlet": "^1.11.4"
   }
 }
