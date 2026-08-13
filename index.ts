@@ -3,6 +3,7 @@
 // this line tells the computer to run this file using bun
 
 import { Command } from "commander";
+import { runWakeup } from "./tui/wakeup";
 
 const program = new Command();
 
@@ -14,10 +15,8 @@ program
 program
   .command("wakeup")
   .description("Wake up ClawCode and pick cli or telegram mode")
-  .action(
-    async () => {
-    console.log("wakeup calling....");
-  }
-);
+  .action(async () => {
+     await runWakeup()
+  });
 
 await program.parseAsync(process.argv);
