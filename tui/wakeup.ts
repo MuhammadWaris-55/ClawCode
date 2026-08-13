@@ -1,6 +1,7 @@
 import { select, isCancel } from "@clack/prompts";
 import chalk from "chalk";
 import figlet from "figlet";
+import { runCliMode } from "../modes/cli";
 
 const BANNER_FONT = "ANSI Shadow";
 const SHADOW = chalk.hex("#5b4d9e");
@@ -35,17 +36,19 @@ export async function runWakeup() {
     message: "Which mode you want to proceed with?",
     options: [
         {value: "cli", label: "CLI"},
-        {value: "telegram", label: "Telegram"}
+        {value: "telegram", label: "Telegram"},
+        {value: "exit", label: "Exit"}
         // {value: "whatsapp", label: "Whatsapp"},
     ]
   });
 
-    if (isCancel(mode)) {
-        process.exit(0);
+    if (isCancel(mode || mode === "exit")) {
+        console.log(chalk.red("\n Exiting the application. Goodbye! \n"));
+        return;
     }
 
     if (mode === "cli") {
-        console.log(chalk.green("You have selected CLI mode. Proceeding with CLI..."));
+        await runCliMode();
     }    
     else if(mode === "telegram") {
         console.log(chalk.green("You have selected Telegram mode. Proceeding with Telegram..."));
