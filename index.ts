@@ -1,4 +1,6 @@
 #!/usr/bin/env bun
+// Shebang: tells the OS to run this file using bun (found via PATH), so it works as a standalone CLI executable
+// this line tells the computer to run this file using bun
 
 import { Command } from "commander";
 
