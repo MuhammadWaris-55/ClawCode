@@ -380,4 +380,68 @@ export class ToolExecutor {
     });
     return text;
   }
+
+  applyApprovedFromTracker(): { errors: string[] } {
+    const errors: string[] = [];
+    const all = [...this.tracker.getActions()];
+
+    for (const a of all.filter(
+      (x) => x.type === "folder_create" && x.status === "approved",
+    )) {
+      try {
+        fs.mkdirSync(this.resolveSafe(a.path), { recursive: true });
+      } catch (e) {
+        errors.push(String(e));
+      }
+    }
+
+    const fileOps = all
+      .filter(
+        (a) =>
+          (a.type === "file_create" ||
+            a.type === "file_modify" ||
+            a.type === "file_delete") &&
+          a.status === "approved",
+      )
+      .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+
+    const lastByPath = new Map<string, ActionLog>();
+    for (const a of fileOps) lastByPath.set(this.norm(a.path), a);
+
+    for (const [p, a] of lastByPath) {
+      try {
+        if (a.type === "file_delete")
+          fs.rmSync(this.resolveSafe(p), { force: true });
+        else {
+          const target = this.resolveSafe(p);
+          fs.mkdirSync(path.dirname(target), { recursive: true });
+          fs.writeFileSync(target, a.details.after ?? "", "utf8");
+        }
+      } catch (e) {
+        errors.push(String(e));
+      }
+    }
+
+    for (const a of all.filter(
+      (x) => x.type === "tool_execute" && x.status === "approved",
+    )) {
+      const cmd = a.details.command;
+      if (!cmd) continue;
+      const r = spawnSync(cmd, {
+        shell: true,
+        cwd: this.config.codebasePath,
+        encoding: "utf8",
+        maxBuffer: 16 * 1024 * 1024,
+      });
+      if (r.status && r.status !== 0)
+        errors.push(`shell exit ${r.status}: ${cmd}`);
+    }
+
+    return { errors };
+  }
+
+  clearStaging(): void {
+    this.overlay.clear();
+    this.deleted.clear();
+  }
 }
