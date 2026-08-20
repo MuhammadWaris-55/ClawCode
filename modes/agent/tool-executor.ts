@@ -73,4 +73,10 @@ export class ToolExecutor {
     }
     return false;
   }
+
+   private assertNotExcluded(rel: string, op: string): void {
+    if (this.excluded(rel)) {
+      throw new Error(`${op}: path is excluded by policy: ${rel}`);
+    }
+  }
 }
