@@ -79,4 +79,13 @@ export class ToolExecutor {
       throw new Error(`${op}: path is excluded by policy: ${rel}`);
     }
   }
+
+   getEffectiveText(rel: string): string | undefined {
+    const key = this.norm(rel);
+    if (this.deleted.has(key)) return undefined;
+    if (this.overlay.has(key)) return this.overlay.get(key);
+    const abs = this.resolveSafe(rel);
+    if (!fs.existsSync(abs) || !fs.statSync(abs).isFile()) return undefined;
+    return fs.readFileSync(abs, "utf8");
+  }
 }
