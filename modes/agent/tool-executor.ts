@@ -39,7 +39,7 @@ export class ToolExecutor {
     private readonly tracker: ActionTracker,
   ) {}
 
-    private resolveSafe(rel: string): string {
+  private resolveSafe(rel: string): string {
     const abs = path.resolve(this.config.codebasePath, rel);
     const root = path.resolve(this.config.codebasePath);
     const relCheck = path.relative(root, abs);
