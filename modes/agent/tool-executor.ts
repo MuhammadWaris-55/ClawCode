@@ -220,4 +220,65 @@ export class ToolExecutor {
     });
     return out || "(empty)";
   }
+
+   searchFiles(
+    rootRel: string,
+    globPattern: string,
+    contentQuery?: string,
+  ): string {
+    this.assertNotExcluded(rootRel, "search_files");
+    const rootAbs = this.resolveSafe(rootRel);
+    if (!fs.existsSync(rootAbs))
+      throw new Error(`search_files: root not found: ${rootRel}`);
+
+    const results: string[] = [];
+    const regexFromGlob = (g: string): RegExp => {
+      const escaped = g
+        .replace(/[.+^${}()|[\]\\]/g, "\\$&")
+        .replace(/\*\*/g, "§§")
+        .replace(/\*/g, "[^/\\\\]*")
+        .replace(/§§/g, ".*")
+        .replace(/\?/g, ".");
+      return new RegExp(`^${escaped}$`, "i");
+    };
+    const nameRe = regexFromGlob(globPattern.replace(/\\/g, "/"));
+
+    const walk = (dir: string) => {
+      for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, ent.name);
+        const relP = path
+          .relative(this.config.codebasePath, full)
+          .split(path.sep)
+          .join("/");
+        if (this.excluded(relP)) continue;
+        if (ent.isDirectory()) walk(full);
+        else if (nameRe.test(relP) || nameRe.test(ent.name)) {
+          if (contentQuery) {
+            if (!isProbablyTextFile(full)) continue;
+            const text = fs.readFileSync(full, "utf8");
+            if (!text.includes(contentQuery)) continue;
+          }
+          results.push(relP);
+        }
+      }
+    };
+
+    if (fs.statSync(rootAbs).isDirectory()) walk(rootAbs);
+    else {
+      const relP = path
+        .relative(this.config.codebasePath, rootAbs)
+        .split(path.sep)
+        .join("/");
+      results.push(relP);
+    }
+
+    const out = [...new Set(results)].sort().join("\n");
+    this.tracker.log({
+      type: "code_analysis",
+      path: this.norm(rootRel),
+      details: { after: out || "(no matches)", toolName: "search_files" },
+      status: "executed",
+    });
+    return out || "(no matches)";
+  }
 }
