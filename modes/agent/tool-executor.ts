@@ -281,4 +281,37 @@ export class ToolExecutor {
     });
     return out || "(no matches)";
   }
+
+  analyzeCodebase(rootRel: string): string {
+    const rootAbs = this.resolveSafe(rootRel);
+    if (!fs.existsSync(rootAbs))
+      throw new Error(`analyze_codebase: not found: ${rootRel}`);
+
+    let files = 0;
+    let dirs = 0;
+    const walk = (dir: string) => {
+      for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, ent.name);
+        const relP = path.relative(this.config.codebasePath, full);
+        if (this.excluded(relP)) continue;
+        if (ent.isDirectory()) {
+          dirs++;
+          walk(full);
+        } else {
+          files++;
+        }
+      }
+    };
+    if (fs.statSync(rootAbs).isDirectory()) walk(rootAbs);
+    else files = 1;
+
+    const summary = `Files: ${files} | Directories: ${dirs}`;
+    this.tracker.log({
+      type: "code_analysis",
+      path: this.norm(rootRel),
+      details: { after: summary, toolName: "analyze_codebase" },
+      status: "executed",
+    });
+    return summary;
+  }
 }
