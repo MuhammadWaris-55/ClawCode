@@ -74,16 +74,23 @@ export class ToolExecutor {
     return false;
   }
 
-   private assertNotExcluded(rel: string, op: string): void {
+  private assertNotExcluded(rel: string, op: string): void {
     if (this.excluded(rel)) {
       throw new Error(`${op}: path is excluded by policy: ${rel}`);
     }
   }
 
-   getEffectiveText(rel: string): string | undefined {
+  // gets a file's current content, accounting for pending (unsaved) changes/deletions
+  getEffectiveText(rel: string): string | undefined {
     const key = this.norm(rel);
+
+    // treat as non-existent if marked for deletion
     if (this.deleted.has(key)) return undefined;
+
+    // return the unsaved in-memory version if one exists
     if (this.overlay.has(key)) return this.overlay.get(key);
+
+    // no pending changes — fall back to reading the real file from disk
     const abs = this.resolveSafe(rel);
     if (!fs.existsSync(abs) || !fs.statSync(abs).isFile()) return undefined;
     return fs.readFileSync(abs, "utf8");
