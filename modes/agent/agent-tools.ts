@@ -12,5 +12,33 @@ export function createAgentTools(executor: ToolExecutor) {
       }),
       execute: async ({ path: p }) => executor.readFile(p),
     }),
+
+    create_file: tool({
+      description:
+        "Stage creation of a new file (not written until the user approves).",
+      inputSchema: z.object({
+        path: z.string(),
+        content: z.string(),
+      }),
+      execute: async ({ path: p, content }) => executor.createFile(p, content),
+    }),
+
+    modify_file: tool({
+      description:
+        "Stage a full-file replacement for an existing file (pending approval).",
+      inputSchema: z.object({
+        path: z.string(),
+        content: z.string().describe("Complete new file contents"),
+      }),
+      execute: async ({ path: p, content }) => executor.modifyFile(p, content),
+    }),
+
+    delete_file: tool({
+      description: "Stage deletion of a file (pending approval).",
+      inputSchema: z.object({
+        path: z.string(),
+      }),
+      execute: async ({ path: p }) => executor.deleteFile(p),
+    }),
   };
 }
