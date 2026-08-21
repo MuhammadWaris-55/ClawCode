@@ -4,19 +4,31 @@ import { defaultAgentConfig } from "./types";
 import { ActionTracker } from "./action-tracker";
 import { ToolExecutor } from "./tool-executor";
 import { createAgentTools } from "./agent-tools";
+import { stepCountIs, ToolLoopAgent } from "ai";
+import { getAgentModel } from "../../ai";
 
-export async function runAgentMode(){
-    console.log(chalk.bold("\n🤖 Agent Mode\n"));
+export async function runAgentMode() {
+  console.log(chalk.bold("\n🤖 Agent Mode\n"));
 
-    const goal = await text({
-        message: "What would you like the agent to do?",
-        placeholder: "Enter your goal here...",
-    })
+  const goal = await text({
+    message: "What would you like the agent to do?",
+    placeholder: "Enter your goal here...",
+  });
 
-    if(isCancel(goal) || !goal.trim()) return;
+  if (isCancel(goal) || !goal.trim()) return;
 
-    const config = defaultAgentConfig();
-    const tracker = new ActionTracker();
-    const executor = new ToolExecutor(config, tracker);
-    const tools = createAgentTools(executor);
+  const config = defaultAgentConfig();
+  const tracker = new ActionTracker();
+  const executor = new ToolExecutor(config, tracker);
+  const tools = createAgentTools(executor);
+
+  const agent = new ToolLoopAgent({
+    model: getAgentModel(),
+    stopWhen: stepCountIs(40),
+    instructions: [
+      `Workspace root: ${config.codebasePath}`,
+      `All mutations must be approved by the user before being applied.`,
+    ].join("\n"),
+    tools,
+  });
 }
