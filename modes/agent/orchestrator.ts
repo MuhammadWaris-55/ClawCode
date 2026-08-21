@@ -45,4 +45,6 @@ export async function runAgentMode() {
       }
     },
   });
+
+  if(result.text?.trim()) console.log(result.text);
 }
