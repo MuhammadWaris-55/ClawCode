@@ -31,4 +31,18 @@ export async function runAgentMode() {
     ].join("\n"),
     tools,
   });
+
+  const result = await agent.generate({
+    prompt: goal.trim(),
+    onStepFinish: ({ toolCalls }) => {
+      for (const tc of toolCalls) {
+        const preview = JSON.stringify(tc.input).slice(0, 160);
+        console.log(
+          chalk.green("  ✓"),
+          chalk.bold(String(tc.toolName)),
+          chalk.dim(preview + (preview.length >= 160 ? "..." : "")),
+        );
+      }
+    },
+  });
 }
