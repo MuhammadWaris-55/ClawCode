@@ -12,7 +12,7 @@ export async function runAgentMode() {
 
   const goal = await text({
     message: "What would you like the agent to do?",
-    placeholder: "Enter your goal here...",
+    placeholder: "concrete task for the agent to perform",
   });
 
   if (isCancel(goal) || !goal.trim()) return;

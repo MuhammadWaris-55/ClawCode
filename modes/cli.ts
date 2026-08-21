@@ -1,5 +1,6 @@
 import { select, isCancel } from "@clack/prompts";
 import chalk from "chalk";
+import { runAgentMode } from "./agent/orchestrator";
 
 export async function runCliMode() {
     while (true) {
@@ -16,7 +17,7 @@ export async function runCliMode() {
         if (isCancel(mode) || mode === "back") return;
 
         if (mode === "agent") {
-            console.log(chalk.green("You have selected Agent mode. Proceeding with Agent..."));
+            await runAgentMode();
         }
         if (mode === "plan") {
             console.log(chalk.green("You have selected Plan mode. Proceeding with Plan..."));
