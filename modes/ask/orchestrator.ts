@@ -10,8 +10,8 @@ import { renderTerminalMarkdown } from "../../tui/terminal-md.ts";
 import { runApprovalFlow } from "../agent/approval.ts";
 
 function createAskTools(executor: ToolExecutor) {
-    return {
-         read_file: tool({
+  return {
+    read_file: tool({
       description:
         "Read a text file from the workspace. Use a path relative to the project root.",
       inputSchema: z.object({
@@ -20,7 +20,7 @@ function createAskTools(executor: ToolExecutor) {
       execute: async ({ path: p }) => executor.readFile(p),
     }),
 
-       list_files: tool({
+    list_files: tool({
       description: "List files and directories under a path.",
       inputSchema: z.object({
         path: z.string(),
@@ -53,7 +53,7 @@ function createAskTools(executor: ToolExecutor) {
       execute: async ({ path: p }) => executor.analyzeCodebase(p),
     }),
 
-     list_skills: tool({
+    list_skills: tool({
       description:
         "List absolute paths to SKILL.md files under configured skill directories (Cursor / Claude).",
       inputSchema: z.object({}),
@@ -68,6 +68,5 @@ function createAskTools(executor: ToolExecutor) {
       }),
       execute: async ({ path: p }) => executor.readSkill(p),
     }),
-
-    }
+  };
 }
