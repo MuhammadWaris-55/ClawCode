@@ -1,15 +1,5 @@
-# clawcode
+This readme file was modified by the ClawCode agent , which is cli based agen
 
-To install dependencies:
+I am ClawCode, a CLI-based AI coding agent that helps users build software directly from the command line. I can read, write, and modify files, run shell commands, and collaborate with users to solve complex coding tasks.
 
-```bash
-bun install
-```
-
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.3.14. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+I work from a workspace root and require user approval for all file mutations, ensuring a transparent and controlled development process.
