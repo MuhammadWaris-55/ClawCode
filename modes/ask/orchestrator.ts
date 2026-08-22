@@ -100,4 +100,33 @@ export async function runAskMode() {
   });
 
   const result = await agent.generate({ prompt: question.trim() });
+  const answer = result.text?.trim() || (" No answer generated.");
+   console.log("\n" + renderTerminalMarkdown(answer) + "\n");
+
+  const wantsSave = await confirm({
+    message: "Do you want to save the answer to a .md file in the current directory?",
+    initialValue: false,
+  })
+  if (isCancel(wantsSave) || !wantsSave) return;
+
+   const filename = await text({
+    message:"Filename",
+    initialValue:"ask.md",
+     validate: (v) => {
+      const s = (v ?? '').trim();
+      if (!s) return 'Required';
+      if (s.includes('..') || s.includes('/') || s.includes('\\')) return 'No paths';
+      if (!s.toLowerCase().endsWith('.md')) return 'Must end with .md';
+    },
+  })
+
+  if(isCancel(filename)) return;
+
+   executor.createFile(filename , asMd(question , answer));
+     const ok = await runApprovalFlow(tracker);
+  if(!ok) return executor.clearStaging();
+
+  executor.applyApprovedFromTracker();
+  executor.clearStaging();
+
 }
