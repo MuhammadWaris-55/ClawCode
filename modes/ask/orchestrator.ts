@@ -70,3 +70,33 @@ function createAskTools(executor: ToolExecutor) {
     }),
   };
 }
+
+
+export async function runAskMode() {
+    console.log(chalk.bold("\n❓ Ask Mode\n"));
+
+    const question = await text({message: "What would you like to ask the agent?"});
+    if(isCancel(question) || !question.trim()) return;
+
+    const config = defaultAgentConfig();
+    config.tools.allowFileCreation = true;
+    config.tools.allowFileModification = false;
+    config.tools.allowFolderCreation = false;
+    config.tools.allowShellExecution = false;
+
+    const tracker = new ActionTracker();
+    const executor = new ToolExecutor(config, tracker);
+    // TODO: web-search tool (firecrawl)
+
+    const tools = {
+        ...createAskTools(executor),
+    }
+
+    const agent = new ToolLoopAgent({
+        model: getAgentModel(),
+        stopWhen: stepCountIs(20),
+        tools,
+    });
+
+    const result = await agent.generate({prompt: question.trim()})
+}
