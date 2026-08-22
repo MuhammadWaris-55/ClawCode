@@ -4,10 +4,10 @@ import type { ActionTracker } from "./action-tracker.ts";
 import type { ActionLog } from "./types.ts";
 import { composeBeforeAfter, formatPatch } from "./diff-view.ts";
 
-interface ReviewGroup{
-    label: string;
-    actionIds: string[];
-    patch: string | null
+interface ReviewGroup {
+  label: string;
+  actionIds: string[];
+  patch: string | null;
 }
 
 function groupPending(pending: ActionLog[]): ReviewGroup[] {
@@ -61,31 +61,50 @@ function groupPending(pending: ActionLog[]): ReviewGroup[] {
   return groups;
 }
 
+export async function runApprovalFlow(
+  tracker: ActionTracker,
+): Promise<boolean> {
+  const pending = tracker.getPendingMutations();
 
-export async function runApprovalFlow(tracker: ActionTracker): Promise<boolean> {
-    const pending = tracker.getPendingMutations();
+  if (pending.length === 0) {
+    console.log(chalk.green("\nNo staged changes to approve. All done!"));
+    return false;
+  }
 
-    if(pending.length === 0) {
-         console.log(chalk.green("\nNo staged changes to approve. All done!"));
-        return false;
-    }
+  const choice = await select({
+    message: "Apply staged changes?",
+    options: [
+      { value: "all", label: " Approve and apply all changes" },
+      { value: "select", label: "🔍 Review changes one by one" },
+      { value: "cancel", label: " Reject all changes" },
+    ],
+  });
 
-    const choice = await select({
-        message: "Apply staged changes?",
+  if (isCancel(choice) || choice === "cancel") {
+    for (const a of pending) tracker.updateStatus(a.id, "rejected", false);
+    return false;
+  }
+
+  if (choice === "all") {
+    for (const a of pending) tracker.updateStatus(a.id, "approved", true);
+    return true;
+  }
+
+  for (const g of groupPending(pending)) {
+    while (true) {
+      const opt = await select({
+        message: chalk.bold(g.label),
         options: [
-            { value: "all", label: " Approve and apply all changes" },
-            { value: "select", label: "🔍 Review changes one by one" },
-            { value: "cancel", label: " Reject all changes" },
+          { value: "accept", label: "Accept" },
+          { value: "diff", label: "Show diff", hint: g.patch ? "" : "N/A" },
+          { value: "reject", label: "Reject" },
         ],
-    });
-
-    if (isCancel(choice) || choice === "cancel") {
-        for(const a of pending) tracker.updateStatus(a.id, "rejected", false);
+      });
+      
+      if (isCancel(opt)) {
+        for (const a of pending) tracker.updateStatus(a.id, "rejected", false);
         return false;
+      }
     }
-
-    if(choice === "all") {
-        for(const a of pending) tracker.updateStatus(a.id, "approved", true);
-        return true;
-    }
+  }
 }
