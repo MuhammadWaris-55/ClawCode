@@ -71,6 +71,11 @@ function createAskTools(executor: ToolExecutor) {
   };
 }
 
+function asMd(question: string, answer: string): string {
+  return `# Ask Mode\n\n## Question\n\n${question.trim()}\n\n## Answer\n\n${answer.trim()}\n`;
+}
+
+
 export async function runAskMode() {
   console.log(chalk.bold("\n❓ Ask Mode\n"));
 
