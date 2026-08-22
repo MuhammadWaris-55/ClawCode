@@ -76,7 +76,7 @@ export async function runApprovalFlow(
     message: "Apply staged changes?",
     options: [
       { value: "all", label: " Approve and apply all changes" },
-      { value: "select", label: "🔍 Review changes one by one" },
+      { value: "select", label: " Review changes one by one" },
       { value: "cancel", label: " Reject all changes" },
     ],
   });

@@ -56,7 +56,7 @@ export async function runAgentMode() {
   const {errors} = executor.applyApprovedFromTracker();
 
   if(errors.length) {
-    console.log(chalk.red(`\n❌ errors occurred while applying changes:`));
+    console.log(chalk.red(`\n errors occurred while applying changes:`));
     for(const e of errors) console.log(chalk.red(`  • ${e}`));
   } 
   else{
