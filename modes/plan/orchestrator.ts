@@ -8,6 +8,7 @@ import { createAgentTools } from "../agent/agent-tools.ts";
 import { defaultAgentConfig } from "../agent/types.ts";
 import { runApprovalFlow } from "../agent/approval.ts";
 import { renderTerminalMarkdown } from "../../tui/terminal-md.ts";
+import { generatePlan } from "./planner.ts";
 
 export async function runPlanMode():Promise<void> {
    console.log(chalk.bold("\n🧭 Plan Mode\n"));
@@ -15,7 +16,6 @@ export async function runPlanMode():Promise<void> {
    const goal = await text({message: "What is your goal?"});
    if (isCancel(goal) || !goal.trim()) return;
 
-   
-
+   const plan = await generatePlan(goal);
 
 }
