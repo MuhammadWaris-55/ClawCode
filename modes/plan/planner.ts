@@ -14,7 +14,6 @@ import { ToolExecutor } from "../agent/tool-executor.ts";
 import { defaultAgentConfig } from "../agent/types.ts";
 import type { Plan, PlanStep } from "./types.ts";
 
-
 const planSchema = z.object({
   researchSummary: z.string().optional(),
   steps: z
@@ -30,10 +29,9 @@ const planSchema = z.object({
     .max(15),
 });
 
-
-function readOnlyTools(executor:ToolExecutor) {
-    return { 
-         read_file: tool({
+function readOnlyTools(executor: ToolExecutor) {
+  return {
+    read_file: tool({
       description:
         "Read a text file from the workspace. Use a path relative to the project root.",
       inputSchema: z.object({
@@ -90,5 +88,5 @@ function readOnlyTools(executor:ToolExecutor) {
       }),
       execute: async ({ path: p }) => executor.readSkill(p),
     }),
-}
+  };
 }
