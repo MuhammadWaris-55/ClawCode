@@ -127,4 +127,16 @@ export async function generatePlan(goal: string) {
     prompt: `User goal: \n${goal}`,
     output: Output.object({ schema: planSchema }),
   });
+
+  const validated = planSchema.parse(result.output);
+
+  const steps: PlanStep[] = validated.steps.map((s, i) => ({
+    id: `step-${i + 1}`,
+    title: s.title,
+    description: s.description,
+    hints: s.hints,
+    complexity: s.complexity,
+  }));
+
+  return { goal, researchSummary: validated.researchSummary, steps };
 }
