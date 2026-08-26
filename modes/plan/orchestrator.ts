@@ -39,7 +39,6 @@ export async function runPlanMode(): Promise<void> {
   const tracker = new ActionTracker();
   const executor = new ToolExecutor(config, tracker);
 
-  //TODO: add web search tools
   const tools = {
     ...createAgentTools(executor),
     ...createWebTools(tracker)
