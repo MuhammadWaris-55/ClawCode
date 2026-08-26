@@ -115,7 +115,10 @@ export async function generatePlan(goal: string) {
     middleware: extractJsonMiddleware(),
   });
 
-  const tools = { ...readOnlyTools(executor), ...(hasWeb ? createWebTools(tracker) : {}) };
+  const tools = {
+    ...readOnlyTools(executor),
+    ...(hasWeb ? createWebTools(tracker) : {}),
+  };
 
   console.log(chalk.cyan("\n🔍 Researching & drafting a plan…\n"));
 
