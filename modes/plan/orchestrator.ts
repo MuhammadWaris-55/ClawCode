@@ -41,7 +41,7 @@ export async function runPlanMode(): Promise<void> {
 
   const tools = {
     ...createAgentTools(executor),
-    ...createWebTools(tracker)
+    ...createWebTools(tracker),
   };
 
   for (const step of selected) {
