@@ -8,6 +8,7 @@ import { defaultAgentConfig, type AgentConfig } from "../agent/types.ts";
 import { createWebTools } from "../plan/web-tools.ts";
 import type { Plan, PlanStep } from "../plan/types.ts";
 import { replyMd } from "./text.ts";
+// import { finishOrApprove } from "./approval-session.ts";
 
 function readOnlyConfig(): AgentConfig {
   const c = defaultAgentConfig();
@@ -65,6 +66,7 @@ function extraWebTools(tracker: ActionTracker) {
   return process.env.FIRECRAWL_API_KEY ? createWebTools(tracker) : {};
 }
 
+
 export async function runAsk(ctx:{reply:(t:string , o?:object)=>Promise<unknown>} , question:string){
      const config = readOnlyConfig();
   const tracker = new ActionTracker();
@@ -91,4 +93,29 @@ export async function runAgent(ctx: { reply: (t: string, o?: object) => Promise<
   const { text } = await agent.generate({ prompt: goal });
   if (text?.trim()) await replyMd(ctx, text.trim());
 //  await finishOrApprove(ctx, chatId, tracker, executor, '✅ Done. No file changes were needed.');
+}
+
+export async function runPlanSteps(
+  ctx: { reply: (t: string, o?: object) => Promise<unknown> },
+  chatId: number,
+  plan: Plan,
+  steps: PlanStep[],
+) {
+  const config = defaultAgentConfig();
+  const tracker = new ActionTracker();
+  const executor = new ToolExecutor(config, tracker);
+  const tools = { ...createAgentTools(executor), ...extraWebTools(tracker) };
+
+  for (const step of steps) {
+    await ctx.reply(`🔧 Executing: *${step.title}*`, { parse_mode: 'Markdown' });
+    const prompt = [`Goal: ${plan.goal}`, `Step: ${step.title}`, step.description].join('\n');
+    const agent = new ToolLoopAgent({
+      ...agentOptions(config, 30),
+      tools,
+    });
+    const { text } = await agent.generate({ prompt });
+    if (text?.trim()) await replyMd(ctx, text.trim());
+  }
+
+//  await finishOrApprove(ctx, chatId, tracker, executor, '✅ All steps done. No file changes needed.');
 }
