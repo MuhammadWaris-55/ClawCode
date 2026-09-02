@@ -1,13 +1,38 @@
 {
   "name": "clawcode",
+  "version": "1.0.0",
+  "description": "A CLI coding agent with Agent/Plan/Ask modes and Telegram control, inspired by OpenClaw",
   "module": "index.ts",
   "type": "module",
-  "private": true,
+  "author": "Muhammad Waris",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MuhammadWaris-55/ClawCode"
+  },
+  "keywords": [
+    "cli",
+    "ai-agent",
+    "coding-agent",
+    "telegram-bot",
+    "bun"
+  ],
   "bin": {
     "clawcode-build": "./index.ts"
   },
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "files": [
+    "index.ts",
+    "ai",
+    "modes",
+    "tui"
+  ],
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/node": "^26.2.0",
+    "@types/marked-terminal": "^6.1.1"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -17,8 +42,6 @@
     "@clack/prompts": "^1.7.0",
     "@mendable/firecrawl-js": "^4.35.0",
     "@openrouter/ai-sdk-provider": "^3.0.0",
-    "@types/marked-terminal": "^6.1.1",
-    "@types/node": "^26.2.0",
     "ai": "^7.0.65",
     "chalk": "^6.0.0",
     "commander": "^15.0.0",
