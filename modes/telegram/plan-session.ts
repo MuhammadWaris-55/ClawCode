@@ -1,3 +1,5 @@
+// This file builds the interactive plan-approval UI inside Telegram — it's the piece that lets you tap checkboxes on your phone to approve/reject individual plan steps, tying into your plan-mode feature.
+
 import { Markup } from "telegraf";
 import type { Plan } from "../plan/types.ts";
 
