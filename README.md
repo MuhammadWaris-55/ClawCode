@@ -34,7 +34,7 @@ npm install -g clawcode-cli
 Or, if you prefer installing with Bun directly:
 
 ```bash
-bun install -g clawcode-cli
+bun add -g clawcode-cli
 ```
 
 This installs the `clawcode-build` command globally on your system.
