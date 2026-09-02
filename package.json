@@ -1,5 +1,5 @@
 {
-  "name": "clawcode",
+  "name": "clawcode-cli",
   "version": "1.0.0",
   "description": "A CLI coding agent with Agent/Plan/Ask modes and Telegram control, inspired by OpenClaw",
   "module": "index.ts",
